@@ -1,2 +1,4 @@
 # hackathon2
-prep
+the marketplace folder is my backend django
+
+the frontend folder is my frontend react 
