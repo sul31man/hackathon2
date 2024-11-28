@@ -6,8 +6,8 @@ function Thankyou(){
     const navigate = useNavigate();
     return(
         <div className="thankyou-container">
-            <h1>Thank you for your Upload</h1>
-            <button onClick={() => navigate('/dashboard')}>Go to Dashboard</button>
+            <h1>Thank you for your Listing</h1>
+            <button onClick={() => navigate('/marketplace')}>Go to Marketplace</button>
         </div>
     );
 }

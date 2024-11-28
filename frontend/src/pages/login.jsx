@@ -26,7 +26,7 @@ function Login(){
                 localStorage.setItem('user', response.data.user.username);
                 localStorage.setItem('email', response.data.user.email);
                 setIsAuth(true);
-                navigate('/dashboard');
+                navigate('/User');
             }
         } catch (error) {
             console.error('Login error:', error);

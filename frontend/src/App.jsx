@@ -6,7 +6,7 @@ import User from './pages/user';
 import About from './pages/about';
 import Register from './pages/register';
 import AuthNavbar from './components/authnavbar';
-import Dashboard from './pages/dashboard';
+import Marketplace from './pages/marketplace';
 import Login from './pages/login';
 import Sell from './pages/Sell';
 import Thankyou from './pages/thankyou';
@@ -15,24 +15,37 @@ import ProtectedRoute from './components/protectedroute';
 import { AuthProvider } from './context/authcontext';
 import { useAuth } from './context/authcontext';
 import { useEffect } from 'react';
-
+import { VerifiedProvider } from './context/verifiedcontext';
+import { useVerified } from './context/verifiedcontext';
 function App(){
   return(
     <AuthProvider>
-      <AppContent />
+      <VerifiedProvider>
+        <AppContent />
+      </VerifiedProvider>
     </AuthProvider>
   )
 }
 
 function AppContent() {
+  
   const { setIsAuth } = useAuth();
+  const { setVerified } = useVerified();
   const token = localStorage.getItem('token');
-
+  const verificationStatus = localStorage.getItem('verificationStatus');
+  
   useEffect(() => {
     if(token){
       setIsAuth(true);
     }
-  }, [token]);
+
+    if(verificationStatus === 'true'){
+      setVerified(true);
+    }
+    
+  }, [token, verificationStatus]);
+
+
   return (
 
         <BrowserRouter>
@@ -45,7 +58,7 @@ function AppContent() {
             <Route path="/login" element={<><Navbar /><Login /></>} />
 
             {/* Auth Routes */}
-            <Route path="/dashboard" element={<ProtectedRoute><><AuthNavbar /><Dashboard /></></ProtectedRoute>} />
+            <Route path="/marketplace" element={<ProtectedRoute><><AuthNavbar /><Marketplace /></></ProtectedRoute>} />
             <Route path="/sell" element={<ProtectedRoute><><AuthNavbar /><Sell /></></ProtectedRoute>} />
             <Route path="/thankyou" element={<Thankyou />} />
             <Route path="/verify" element={<Verify />} />

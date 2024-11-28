@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from django.contrib.auth.models import User
+from .models import Product
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -10,6 +11,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
+from rest_framework import viewsets
+from .serializers import ProductSerializer
 
 @api_view(['POST'])
 def register_user(request):
@@ -102,15 +107,64 @@ def verify_token(request):
 
 @api_view(['POST'])
 def send_verification_email(request):
-    email = request.data.get('email')
+    try:
+        email = request.data.get('email')
+        
+        if not email:
+            return Response(
+                {'error': 'Email is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        verification_code = get_random_string(length=6, allowed_chars='0123456789')
+
+        subject = 'Email Verification Code'
+        message = f'Your verification code is: {verification_code}'
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [email]
+        
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=from_email,
+            recipient_list=recipient_list,
+            fail_silently=False,
+        )
+
+        return Response({
+            'message': 'Verification email sent', 
+            'verification_code': verification_code
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        print(f"Email error: {str(e)}")  # For debugging
+        return Response({
+            'error': 'Failed to send email'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    verification_code = get_random_string(length=6, allowed_chars='0123456789')
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def sell_product(request):
+    try:
+        seller = request.user
+        name = request.data.get('name')
+        description = request.data.get('description')
+        price = request.data.get('price')
+        image = request.data.get('image')
 
-    subject = 'Email Verification Code'
-    message = f'Your verification code is: {verification_code}'
-    from_email = settings.EMAIL_HOST_USER
-    recipient_list = [email]
-    send_mail(subject, message, from_email, recipient_list)
+        Product.objects.create(
+            seller=seller,
+            name=name,
+            description=description,
+            price=price,
+            image=image
+        )
+        return Response({'message': 'Product listed successfully'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(f"Error listing product: {str(e)}")
+        print(f"Seller: {request.user}")
+        return Response({'error': 'Failed to list product', 'error_detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-    return Response({'message': 'Verification email sent'}, status=status.HTTP_200_OK, verification_code=verification_code)
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer

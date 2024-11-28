@@ -2,7 +2,11 @@ import '../styles/sell.css';
 import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useVerified } from '../context/verifiedcontext';
+
 function Sell(){
+    const { verified } = useVerified();
+    
     const url = 'http://localhost:8000/backend1/sell/';
     const [formData, setFormData] = useState({
         name: '',
@@ -19,22 +23,28 @@ function Sell(){
         e.preventDefault();
         
         try {
-
              const response = await axios.post(url, {
                 name,
                 description,
                 price,
                 quantity,
                 image
+             }, {
+                headers: {
+                    'Authorization': `Token ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true
              });
              console.log(response.data);
              setMessage(response.data.message);
              navigate('/thankyou');
         } catch (error) {
             console.error('Error:', error.response?.data);
+            setMessage(error.response?.data?.error || 'An error occurred');
         }
     }
-
+    
     function handleChange(e){
         setFormData({
             ...formData,
@@ -44,7 +54,11 @@ function Sell(){
 
     return(
         <>
-        <div>
+        <div style = {{display: !verified ? 'block' : 'none'}}>
+            <h1>You need to verify your email to sell items</h1>
+            <button onClick={() => navigate('/verify')}>Verify Email</button>
+        </div>
+        <div style={{display: verified ? 'block' : 'none'}}>
             <h1>Sell your items</h1>
         </div>
         <div className="sell-description">
