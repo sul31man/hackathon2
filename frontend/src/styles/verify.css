@@ -1,0 +1,34 @@
+.verify-button button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.verify-container {
+    transform: translateY(0px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-button {
+    background-color: #007bff;
+    color: #000000;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    background-color: #000000;
+    color: #000000;
+}
+
+.page-background {
+    min-height: 100vh;
+    background: radial-gradient(circle at var(--x) var(--y), 
+                blue, black 50%);
+}

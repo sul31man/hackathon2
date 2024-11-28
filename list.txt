@@ -1,0 +1,7 @@
+finish creating the proptected routes page so that everythin is protected
+
+finish creating the verification system
+
+create the product, purchase, sales models and the view functions for them 
+
+Work on the dashboard marketplace which will then display certain products based on efficient algorithms.

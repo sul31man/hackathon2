@@ -2,9 +2,10 @@ import '../styles/register.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from '../context/authcontext';
 
-function Register({setIsAuth}) {
-
+function Register() {
+    const { setIsAuth } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         username: '',

@@ -8,13 +8,24 @@ import Register from './pages/register';
 import AuthNavbar from './components/authnavbar';
 import Dashboard from './pages/dashboard';
 import Login from './pages/login';
-import { useState } from 'react';
-import {useEffect} from 'react';
+import Sell from './pages/Sell';
+import Thankyou from './pages/thankyou';
+import Verify from './pages/verify';
+import ProtectedRoute from './components/protectedroute';
+import { AuthProvider } from './context/authcontext';
+import { useAuth } from './context/authcontext';
+import { useEffect } from 'react';
 
-function App() {
+function App(){
+  return(
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  )
+}
 
-  const [isAuth, setIsAuth] = useState(false);
-
+function AppContent() {
+  const { setIsAuth } = useAuth();
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -22,24 +33,26 @@ function App() {
       setIsAuth(true);
     }
   }, [token]);
-
   return (
-    <BrowserRouter>
-      {isAuth ? <AuthNavbar setAuth={setIsAuth} /> : <Navbar />}
-      <div>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/User" element={<User />} />
-          <Route path="/About" element={<About />} />
-          <Route path="/register" element={<Register setIsAuth={setIsAuth} />} />
-          <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
 
-          {/* Auth Routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
+        <BrowserRouter>
+        <div>
+          <Routes>
+            <Route path="/" element={<><Navbar /><Home /></>} />
+            <Route path="/User" element={<ProtectedRoute><><AuthNavbar /><User /></></ProtectedRoute>} />
+            <Route path="/About" element={<><Navbar /><About /></>} />
+            <Route path="/register" element={<><Navbar /><Register /></>} />
+            <Route path="/login" element={<><Navbar /><Login /></>} />
 
-        </Routes>
-      </div>
-    </BrowserRouter>
+            {/* Auth Routes */}
+            <Route path="/dashboard" element={<ProtectedRoute><><AuthNavbar /><Dashboard /></></ProtectedRoute>} />
+            <Route path="/sell" element={<ProtectedRoute><><AuthNavbar /><Sell /></></ProtectedRoute>} />
+            <Route path="/thankyou" element={<Thankyou />} />
+            <Route path="/verify" element={<Verify />} />
+          </Routes>
+        </div>
+        </BrowserRouter>
+
   );
 }
 

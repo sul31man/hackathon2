@@ -2,8 +2,10 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/login.css';
+import { useAuth } from '../context/authcontext';
 
-function Login({setIsAuth}){
+function Login(){
+    const { setIsAuth } = useAuth();
     const [formData, setFormData] = useState({
         username: '',
         password: ''

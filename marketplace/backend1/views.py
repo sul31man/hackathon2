@@ -6,6 +6,10 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.crypto import get_random_string
 
 @api_view(['POST'])
 def register_user(request):
@@ -87,3 +91,26 @@ def login_user(request):
         'user': {
             'id': user.id, 'username': user.username, 'email': user.email}
     })
+
+
+@api_view(['GET'])
+def verify_token(request):
+    token = request.headers.get('Authorization').split(' ')[1]
+    token = Token.objects.get(key=token)
+    return Response({'message': 'Token is valid'}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def send_verification_email(request):
+    email = request.data.get('email')
+    
+    verification_code = get_random_string(length=6, allowed_chars='0123456789')
+
+    subject = 'Email Verification Code'
+    message = f'Your verification code is: {verification_code}'
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [email]
+    send_mail(subject, message, from_email, recipient_list)
+
+
+    return Response({'message': 'Verification email sent'}, status=status.HTTP_200_OK, verification_code=verification_code)

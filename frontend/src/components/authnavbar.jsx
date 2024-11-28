@@ -2,12 +2,17 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/navbar.css';
 import { useNavigate } from 'react-router-dom';
-function AuthNavbar({setIsAuth}) {
+import { AuthContext } from '../context/authcontext';
+import { useContext } from 'react';
+
+function AuthNavbar() {
     const location = useLocation(); // Helps track current route
     const navigate = useNavigate();
+    const { setIsAuth } = useContext(AuthContext);
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem('email');
         navigate('/');
         setIsAuth(false);
     };
@@ -30,6 +35,12 @@ function AuthNavbar({setIsAuth}) {
                     className={location.pathname === '/dashboard' ? 'active' : ''}
                 >
                     Dashboard
+                </Link>
+                <Link 
+                    to="/sell"
+                    className={location.pathname === '/sell' ? 'active' : ''}
+                >
+                    Sell
                 </Link>
                 <button onClick={handleLogout} className="logout-button">Logout</button>
                 
